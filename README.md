@@ -1,7 +1,7 @@
 Python Least Squares. To do Eventually:
 
 
-Matrix Class & functions -> methods
+Matrix Class & methods
 
 Operator Overloading
 
