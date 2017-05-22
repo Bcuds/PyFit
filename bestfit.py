@@ -109,29 +109,54 @@ def rowreduce(A):
     return A
 
 def getdata():
-        #Pre Condition : Gets a comma seperated set of numbers from the user. // TODO : Make File Work
-        #Post condition: Stores it in a list, and returns a 2 x N list
-        #Purpose       : Gets data which will be used
+	    #Pre Condition : Gets a comma seperated set of numbers from the user. // TODO : Make File Work
+	    #Post condition: Stores it in a list, and returns a 2 x N list
+	    #Purpose       : Gets data which will be used
 
-        
-        #This function gets the data from the user. Inputted (hopefully copied) as a list
-        #It presumes you are solving for f(x) = y
-        print("Assuming the data input is a list of x values and a list of y values. ")
-        print("Enter a value like")
-        print("1,2,3,4")
-        data = []
-        var = ["x","y"]
-        for i in range(2):
-            print(" Please enter  of values of the dependent variable. This is the coordinate {0}".format(var[i]))
-            data.append(eval(input("")))
-            print(" Data points for  {0} has been entered".format(var[i]))
-        return data
+	    
+	    #This function gets the data from the user. Inputted (hopefully copied) as a list
+	    #It presumes you are solving for f(x) = y
+	    print("How would you like to enter data? \n a .txt file: 1  \n Manually enter: 2")
+	    usernumber = input(">  ")
+	    if usernumber == '2' :	
+	        print("Assuming the data input is a list of x values and a list of y values. ")
+	        print("Enter a value like")
+	        print("1,2,3,4")
+	        data = []
+	        var = ["x","y"]
+	        for i in range(2):
+	            print(" Please enter  of values of the dependent variable. This is the coordinate {0}".format(var[i]))
+	            data.append(eval(input("")))
+	            print(" Data points for  {0} has been entered".format(var[i]))
+	    elif usernumber == '1':
+	    	data = [[],[]]
+	    	delimiter = input("What is the delimiter if the text document? ")
+	    	filename = input ("Please enter a filename  \n>   ")
+	    	infile = open(filename,'r')
+	    	for line in infile:
+	    		line = line.strip()
+	    		line = line.split(delimiter)
+	    		data[0].append(int(line[0]))
+	    		data[1].append(int(line[1]))	    		
+	    else:
+	    	print("Please enter either '1' or '2' ")
+	    	data = getdata()
+	    return data
 
 def printmatrix(A):
     # Primitive Method of printing a matrix
     for line in A:
         print(line)
     print("")
+
+def printWithCoefs(matrix, coeffs):
+	if coeffs[0] != "false":
+		for num,line in enumerate(matrix):
+			print (coeffs[num],' = ', line [-1])
+		print("")
+	else:
+		for i in range(len(matrix)):
+			print("Coefficent " ,i+1, ' : ',matrix[i][-1])
 
 def formmatrix(indata): # Needs to be cleaned up a little bit
     # Pre Condition     : Data from the user.
@@ -150,13 +175,14 @@ def formmatrix(indata): # Needs to be cleaned up a little bit
     ##
     if (usernumber == 1):
         userfunction = "{0},1"
-        #coeffs = ['m','b']
+        coeffs = ['m','b']
     elif (usernumber == 2):
         # The 'test case' is for a y = Var1*exp(ax) + Var2*exp(bx) Ideally I can find some way of making the user enter the specific function they want.
         print("For example, if you want to fit to y = C1 exp(-.02x) + C2 exp(-.07x),  then you have to input 'math.exp(-.02 * {0}),math.exp( -.07 * {0})'")
         print("For a line, you would want '{0},1' , and this solves for 'm' and 'b' in y = mx + b")
         print("essentially, and plus sign is a comma, and any coefficent has to be left blank. Make the dependent variable, x, {0}")
         userfunction = input("Please enter the function you want to fit data to   \n ")
+        coeffs = ["false"]
     ##
     # Make each row in the matrix that gets returned equal user's function -f- evaluated at 'x', where the '+' or '-' delimits elements of the row
     ##
@@ -168,7 +194,7 @@ def formmatrix(indata): # Needs to be cleaned up a little bit
     newb = []
     for elt in b:
         newb = newb + [[elt]]
-    return outmatrix,newb
+    return outmatrix,newb,coeffs
 
 def equate(A,b):
     # Pre Condition     : A Matrix 'A' and a vector 'b'
@@ -185,7 +211,7 @@ def bestfit( ):
     # Data comes from the user, which I have to  make a bit better.
     data = getdata()
     # Gets the Matricies 'A' and 'b' In their ready to go states
-    A,b = formmatrix(data) 
+    A,b,coeffs = formmatrix(data) 
     #Compute Transpose(A)*A = Transpose(A)*b
     left = matrixproduct(transpose(A),A)
     right = matrixproduct(transpose(A),b)
@@ -193,7 +219,7 @@ def bestfit( ):
     finalmatrix = equate(left,right)
     #Rowreduces said matrix
     rowreduce(finalmatrix)
-    printmatrix(finalmatrix) 
+    printWithCoefs(finalmatrix,coeffs) 
     test = input()
     #Plots user's input Data
     #plt.scatter(data[0],data[1])    
